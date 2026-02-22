@@ -3,16 +3,24 @@ import WelcomeScreen from './components/WelcomeScreen';
 import PurposeScreen from './components/PurposeScreen';
 import TimeSelectionScreen from './components/TimeSelectionScreen';
 import SessionActive from './components/SessionActive';
-import { supabase } from './lib/supabase';
+import SessionsHistory from './components/SessionsHistory';
+import { saveCompletedSession } from './lib/sessionDb';
 
-type Step = 'welcome' | 'purpose' | 'time' | 'active';
+type Step = 'welcome' | 'purpose' | 'time' | 'active' | 'history';
 
 function App() {
   const [step, setStep] = useState<Step>('welcome');
   const [selectedApp, setSelectedApp] = useState('');
   const [selectedPurpose, setSelectedPurpose] = useState('');
   const [selectedDuration, setSelectedDuration] = useState(0);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionStartedAt, setSessionStartedAt] = useState<Date | null>(null);
+  const [lastCompletedSession, setLastCompletedSession] = useState<{
+    appName: string;
+    purpose: string;
+    displayName: string;
+    plannedMinutes: number;
+    endedAt: string;
+  } | null>(null);
 
   const handleSelectApp = (app: string) => {
     setSelectedApp(app);
@@ -24,48 +32,33 @@ function App() {
     setStep('time');
   };
 
-  const handleSelectTime = async (minutes: number) => {
+  const handleSelectTime = (minutes: number) => {
     setSelectedDuration(minutes);
-
-    const { data, error } = await supabase
-      .from('sessions')
-      .insert({
-        app_name: selectedApp,
-        purpose: selectedPurpose,
-        duration_minutes: minutes,
-      })
-      .select()
-      .single();
-
-    if (!error && data) {
-      setSessionId(data.id);
-      setStep('active');
-    }
+    setSessionStartedAt(new Date());
+    setStep('active');
   };
 
   const handleCompleteSession = async () => {
-    if (sessionId) {
-      await supabase
-        .from('sessions')
-        .update({
-          completed: true,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', sessionId);
+    if (sessionStartedAt) {
+      await saveCompletedSession(
+        selectedApp,
+        selectedPurpose,
+        selectedDuration,
+        sessionStartedAt
+      );
     }
-    resetFlow();
+
+    setLastCompletedSession({
+      appName: selectedApp,
+      purpose: selectedPurpose,
+      displayName: 'Guest User',
+      plannedMinutes: selectedDuration,
+      endedAt: new Date().toISOString(),
+    });
+    setStep('history');
   };
 
-  const handleCancelSession = async () => {
-    if (sessionId) {
-      await supabase
-        .from('sessions')
-        .update({
-          completed: false,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', sessionId);
-    }
+  const handleCancelSession = () => {
     resetFlow();
   };
 
@@ -74,12 +67,18 @@ function App() {
     setSelectedApp('');
     setSelectedPurpose('');
     setSelectedDuration(0);
-    setSessionId(null);
+    setSessionStartedAt(null);
+    setLastCompletedSession(null);
   };
 
   return (
     <>
-      {step === 'welcome' && <WelcomeScreen onSelectApp={handleSelectApp} />}
+      {step === 'welcome' && (
+        <WelcomeScreen
+          onSelectApp={handleSelectApp}
+          onViewHistory={() => setStep('history')}
+        />
+      )}
       {step === 'purpose' && (
         <PurposeScreen
           appName={selectedApp}
@@ -103,6 +102,9 @@ function App() {
           onComplete={handleCompleteSession}
           onCancel={handleCancelSession}
         />
+      )}
+      {step === 'history' && (
+        <SessionsHistory onBack={resetFlow} lastCompleted={lastCompletedSession} />
       )}
     </>
   );

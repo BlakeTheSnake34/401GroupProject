@@ -3,9 +3,10 @@ import { AppCategory } from '../types';
 
 interface WelcomeScreenProps {
   onSelectApp: (app: string) => void;
+  onViewHistory?: () => void;
 }
 
-export default function WelcomeScreen({ onSelectApp }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onSelectApp, onViewHistory }: WelcomeScreenProps) {
   const apps: AppCategory[] = [
     { id: 'instagram', name: 'Instagram', icon: 'instagram', color: 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400' },
     { id: 'discord', name: 'Discord', icon: 'discord', color: 'bg-indigo-600' },
@@ -46,13 +47,14 @@ export default function WelcomeScreen({ onSelectApp }: WelcomeScreenProps) {
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-12">
             <h1 className="text-2xl font-bold text-gray-900">Purpose</h1>
-            <button className="text-gray-500">
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
+            {onViewHistory && (
+              <button
+                onClick={onViewHistory}
+                className="text-gray-600 hover:text-gray-900 font-medium text-sm"
+              >
+                View History
+              </button>
+            )}
           </div>
 
           <div className="mb-12">
