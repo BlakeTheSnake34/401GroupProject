@@ -97,6 +97,7 @@ CREATE TABLE focus_session (
     session_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     purpose_id INT NOT NULL,
+    app_name VARCHAR(100) NOT NULL,
     planned_minutes INT NOT NULL,
     started_at TIMESTAMP NOT NULL,
     ended_at TIMESTAMP,

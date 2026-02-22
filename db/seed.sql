@@ -47,12 +47,12 @@ INSERT INTO recommendation (user_id, app_id, recommendation_text, source, is_acc
 (3, 4, 'Use a focus playlist with no lyrics.', 'system', TRUE);
 
 INSERT INTO focus_session (
-    user_id, purpose_id, planned_minutes, started_at, ended_at, actual_seconds, end_reason
+    user_id, purpose_id, app_name, planned_minutes, started_at, ended_at, actual_seconds, end_reason
 ) VALUES
-(1, 1, 15, CURRENT_TIMESTAMP - INTERVAL '2 hours', CURRENT_TIMESTAMP - INTERVAL '1 hour 45 minutes', 900, 'completed'),
-(1, 2, 20, CURRENT_TIMESTAMP - INTERVAL '1 hour', CURRENT_TIMESTAMP - INTERVAL '50 minutes', 600, 'ended_early'),
-(2, 3, 25, CURRENT_TIMESTAMP - INTERVAL '3 hours', CURRENT_TIMESTAMP - INTERVAL '2 hours 35 minutes', 1500, 'completed'),
-(3, 4, 30, CURRENT_TIMESTAMP - INTERVAL '4 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours 20 minutes', 2400, 'completed');
+(1, 1, 'Instagram', 15, CURRENT_TIMESTAMP - INTERVAL '2 hours', CURRENT_TIMESTAMP - INTERVAL '1 hour 45 minutes', 900, 'completed'),
+(1, 2, 'YouTube', 20, CURRENT_TIMESTAMP - INTERVAL '1 hour', CURRENT_TIMESTAMP - INTERVAL '50 minutes', 600, 'ended_early'),
+(2, 3, 'Discord', 25, CURRENT_TIMESTAMP - INTERVAL '3 hours', CURRENT_TIMESTAMP - INTERVAL '2 hours 35 minutes', 1500, 'completed'),
+(3, 4, 'Spotify', 30, CURRENT_TIMESTAMP - INTERVAL '4 hours', CURRENT_TIMESTAMP - INTERVAL '3 hours 20 minutes', 2400, 'completed');
 
 INSERT INTO session_rating (session_id, rating_value, notes) VALUES
 (1, 5, 'Stayed on task the whole time'),
